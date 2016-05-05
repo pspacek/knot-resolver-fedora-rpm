@@ -1,0 +1,11 @@
+[Unit]
+Description=Knot DNS Resolver daemon
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/kresd -f1 -c /etc/kresd/config /var/lib/kresd
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
