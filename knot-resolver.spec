@@ -1,9 +1,8 @@
 %global _hardened_build 1
-%global alphatag 4f463d7
 
 Name:           knot-resolver
 Version:        1.0.0
-Release:        0.3.%{alphatag}%{?dist}
+Release:        1%{?dist}
 Summary:        Caching full DNS Resolver
 
 License:        GPLv3
@@ -12,7 +11,7 @@ URL:            https://www.knot-resolver.cz/
 # $ git clone https://gitlab.labs.nic.cz/knot/resolver.git knot-resolver
 # $ cd knot-resolver
 # $ git archive --format tar --prefix knot-resolver-1.0.0-alphatag/ alphatag | xz > knot-resolver-1.0.0-alphatag.tar.xz
-Source0:        knot-resolver-%{version}-%{alphatag}.tar.xz
+Source0:        knot-resolver-%{version}.tar.xz
 Source1:        kresd.service
 Source2:        config
 Source3:        root.keys
@@ -55,7 +54,7 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 The package contains development headers for Knot DNS Resolver.
 
 %prep
-%setup -q -n %{name}-%{version}-%{alphatag}
+%autosetup
 rm -v scripts/bootstrap-depends.sh
 
 %build
@@ -124,6 +123,9 @@ exit 0
 %{_libdir}/libkres.so
 
 %changelog
+* Tue May 31 2016 Jan Vcelak <jvcelak@fedoraproject.org> - 1.0.0-1
+- final release
+
 * Thu May 05 2016 Jan Vcelak <jvcelak@fedoraproject.org> - 1.0.0-0.3.4f463d7
 - update to latest git version
 - re-enable unit-test
