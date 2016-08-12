@@ -1,29 +1,32 @@
 %global _hardened_build 1
 
 Name:           knot-resolver
-Version:        1.0.0
+Version:        1.1.0
 Release:        1%{?dist}
 Summary:        Caching full DNS Resolver
 
 License:        GPLv3
 URL:            https://www.knot-resolver.cz/
-# No tarballs have been published by the upstream yet.
-# $ git clone https://gitlab.labs.nic.cz/knot/resolver.git knot-resolver
-# $ cd knot-resolver
-# $ git archive --format tar --prefix knot-resolver-1.0.0-alphatag/ alphatag | xz > knot-resolver-1.0.0-alphatag.tar.xz
-Source0:        knot-resolver-%{version}.tar.xz
-Source1:        kresd.service
-Source2:        config
-Source3:        root.keys
+Source0:	https://secure.nic.cz/files/%{name}/%{name}-%{version}.tar.xz
 
-BuildRequires:  pkgconfig(libknot) >= 2.1
+Source1:        config
+Source2:        root.keys
+
+Source100:	kresd.service
+Source101:	kresd.socket
+Source102:	kresd-control.socket
+Source103:	kresd-tls.socket
+Source104:	kresd.tmpfiles
+
+BuildRequires:  pkgconfig(libknot) >= 2.3
 BuildRequires:  pkgconfig(libzscanner)
 BuildRequires:  pkgconfig(libdnssec)
-BuildRequires:  pkgconfig(libuv) >= 1.0
-BuildRequires:  pkgconfig(luajit)
+BuildRequires:  pkgconfig(libuv) >= 1.7
+BuildRequires:  pkgconfig(luajit) >= 2.0
 
 BuildRequires:  pkgconfig(libmemcached) >= 1.0
 BuildRequires:  pkgconfig(hiredis)
+BuildRequires:  pkgconfig(libsystemd)
 
 BuildRequires:  pkgconfig(cmocka)
 BuildRequires:  pkgconfig(socket_wrapper)
@@ -34,6 +37,9 @@ BuildRequires:  systemd
 #BuildRequires: breathe
 #BuildRequires: python-sphinx
 #BuildRequires: python-sphinx_rtd_theme
+
+Requires:       lua-socket
+Requires:       lua-sec
 
 Requires(pre): shadow-utils
 Requires(post): systemd
@@ -70,20 +76,29 @@ make %{?_smp_mflags} %{build_flags}
 install -m 0755 -d %{buildroot}%{_pkgdocdir}
 mv %{buildroot}%{_sysconfdir}/kresd/config.* %{buildroot}%{_pkgdocdir}
 chmod 0644 %{buildroot}%{_pkgdocdir}/config.*
+rm -vr %{buildroot}%{_sysconfdir}/kresd
 
-# install service
+# install configuration files
+mkdir -p %{buildroot}%{_sysconfdir}
+install -m 0755 -d %{buildroot}%{_sysconfdir}/kresd
+install -m 0644 -p %SOURCE1 %{buildroot}%{_sysconfdir}/kresd/config
+install -m 0644 -p %SOURCE2 %{buildroot}%{_sysconfdir}/kresd/root.keys
+
+# install systemd units
 mkdir -p %{buildroot}%{_unitdir}
-install -m 0644 -p %SOURCE1 %{buildroot}%{_unitdir}/kresd.service
+install -m 0644 -p %SOURCE100 %{buildroot}%{_unitdir}/kresd.service
+install -m 0644 -p %SOURCE101 %{buildroot}%{_unitdir}/kresd.socket
+install -m 0644 -p %SOURCE102 %{buildroot}%{_unitdir}/kresd-control.socket
+install -m 0644 -p %SOURCE103 %{buildroot}%{_unitdir}/kresd-tls.socket
 
-# install configuration file
-install -m 0644 -p %SOURCE2 %{buildroot}%{_sysconfdir}/kresd/config
+# install tmpfiles.d
+mkdir -p %{buildroot}%{_tmpfilesdir}
+install -m 0644 -p %SOURCE104 %{buildroot}%{_tmpfilesdir}/kresd.conf
+mkdir -p %{buildroot}%{_rundir}
+install -m 0750 -d %{buildroot}%{_rundir}/kresd
 
-# remove ICANN key
-rm %{buildroot}%{_sysconfdir}/kresd/icann-ca.pem
-
-# create working directory
-install -m 0755 -d %{buildroot}%{_sharedstatedir}/kresd
-install -m 0644 -p %SOURCE3 %{buildroot}%{_sharedstatedir}/kresd/root.keys
+# remove module with unsatisfied dependencies
+rm -r %{buildroot}%{_libdir}/kdns_modules/{http,http.lua}
 
 %check
 LD_PRELOAD=lib/libkres.so make check %{build_flags} LDFLAGS="%{__global_ldflags} -ldl"
@@ -109,12 +124,14 @@ exit 0
 %doc %{_pkgdocdir}
 %attr(755,root,kresd) %dir %{_sysconfdir}/kresd
 %attr(644,root,kresd) %config(noreplace) %{_sysconfdir}/kresd/config
+%attr(644,root,kresd) %config(noreplace) %{_sysconfdir}/kresd/root.keys
+%attr(750,kresd,kresd) %dir %{_rundir}/kresd
 %{_unitdir}/kresd.service
-%{_bindir}/kresd
+%{_unitdir}/kresd*.socket
+%{_tmpfilesdir}/kresd.conf
+%{_sbindir}/kresd
 %{_libdir}/libkres.so.*
 %{_libdir}/kdns_modules
-%attr(755,kresd,kresd) %dir %{_sharedstatedir}/kresd
-%attr(644,kresd,kresd) %config(noreplace) %{_sharedstatedir}/kresd/root.keys
 %{_mandir}/man8/kresd.*
 
 %files devel
@@ -123,6 +140,16 @@ exit 0
 %{_libdir}/libkres.so
 
 %changelog
+* Fri Aug 12 2016 Jan Vcelak <jvcelak@fedoraproject.org> - 1.1.0-1
+- new upstream release:
+  + RFC7873 DNS Cookies
+  + RFC7858 DNS over TLS
+  + Metrics exported in Prometheus
+  + DNS firewall module
+  + Explicit CNAME target fetching in strict mode
+  + Query minimisation improvements 
+  + Improved integration with systemd
+
 * Tue May 31 2016 Jan Vcelak <jvcelak@fedoraproject.org> - 1.0.0-1
 - final release
 

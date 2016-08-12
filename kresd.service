@@ -1,11 +1,15 @@
 [Unit]
 Description=Knot DNS Resolver daemon
-After=network.target
+Documentation=man:kresd(8)
+## This is a socket-activated service:
+RefuseManualStart=true
 
 [Service]
-Type=simple
-ExecStart=/usr/bin/kresd -f1 -c /etc/kresd/config /var/lib/kresd
-Restart=on-abort
+Type=notify
+WorkingDirectory=/run/kresd
+ExecStart=/usr/sbin/kresd -c /etc/kresd/config
+User=kresd
+Restart=on-failure
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=sockets.target

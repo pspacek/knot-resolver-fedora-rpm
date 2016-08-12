@@ -1,20 +1,12 @@
 -- vim:syntax=lua:
 -- Refer to manual: http://knot-resolver.readthedocs.org/en/latest/daemon.html#configuration
 
--- Listen on local interfaces
-net = { '127.0.0.1', '::1' }
-
--- Drop root privileges (unprivileged after this point)
-user('kresd', 'kresd')
-
--- DNSSEC root TA
-trust_anchors.file = 'root.keys'
+-- unmanaged DNSSEC root TA
+trust_anchors.config('/etc/kresd/root.keys', true)
 
 -- Load useful modules
 modules = {
 	'policy',   -- Block queries to local zones/bad sites
-	'cachectl', -- Cache control interface
-	'hints',    -- Load /etc/hosts and allow custom root hints
 	'stats',    -- Track internal statistics
 	'predict',  -- Prefetch expiring/frequent records
 }
