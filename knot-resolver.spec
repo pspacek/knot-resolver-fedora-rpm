@@ -21,7 +21,7 @@ Source104:	kresd.tmpfiles
 BuildRequires:  pkgconfig(libknot) >= 2.3
 BuildRequires:  pkgconfig(libzscanner)
 BuildRequires:  pkgconfig(libdnssec)
-BuildRequires:  pkgconfig(libuv) >= 1.7
+BuildRequires:  pkgconfig(libuv)
 BuildRequires:  pkgconfig(luajit) >= 2.0
 
 BuildRequires:  pkgconfig(libmemcached) >= 1.0
