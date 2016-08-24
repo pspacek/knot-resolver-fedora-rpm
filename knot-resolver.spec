@@ -1,7 +1,7 @@
 %global _hardened_build 1
 
 Name:           knot-resolver
-Version:        1.1.0
+Version:        1.1.1
 Release:        1%{?dist}
 Summary:        Caching full DNS Resolver
 
@@ -140,6 +140,10 @@ exit 0
 %{_libdir}/libkres.so
 
 %changelog
+* Wed Aug 24 2016 Jan Vcelak <jvcelak@fedoraproject.org> - 1.1.1-1
+- new upstream release:
+  + fix name server fallback in case some of the servers are unreachable
+
 * Fri Aug 12 2016 Jan Vcelak <jvcelak@fedoraproject.org> - 1.1.0-1
 - new upstream release:
   + RFC7873 DNS Cookies
