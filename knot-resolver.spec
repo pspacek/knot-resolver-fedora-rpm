@@ -2,7 +2,7 @@
 
 Name:           knot-resolver
 Version:        1.1.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Caching full DNS Resolver
 
 License:        GPLv3
@@ -140,6 +140,9 @@ exit 0
 %{_libdir}/libkres.so
 
 %changelog
+* Mon Aug 29 2016 Igor Gnatenko <ignatenko@redhat.com> - 1.1.1-2
+- Rebuild for LuaJIT 2.1.0
+
 * Wed Aug 24 2016 Jan Vcelak <jvcelak@fedoraproject.org> - 1.1.1-1
 - new upstream release:
   + fix name server fallback in case some of the servers are unreachable
