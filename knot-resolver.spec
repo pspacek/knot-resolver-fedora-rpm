@@ -2,12 +2,15 @@
 
 Name:           knot-resolver
 Version:        1.1.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Caching full DNS Resolver
 
 License:        GPLv3
 URL:            https://www.knot-resolver.cz/
 Source0:	https://secure.nic.cz/files/%{name}/%{name}-%{version}.tar.xz
+
+# LuaJIT only on these arches
+ExclusiveArch: %{arm} aarch64 %{ix86} x86_64
 
 Source1:        config
 Source2:        root.keys
@@ -140,6 +143,9 @@ exit 0
 %{_libdir}/libkres.so
 
 %changelog
+* Sat Nov 19 2016 Peter Robinson <pbrobinson@fedoraproject.org> 1.1.1-3
+- Add ExclusiveArch for architectures with LuaJIT
+
 * Mon Aug 29 2016 Igor Gnatenko <ignatenko@redhat.com> - 1.1.1-2
 - Rebuild for LuaJIT 2.1.0
 
