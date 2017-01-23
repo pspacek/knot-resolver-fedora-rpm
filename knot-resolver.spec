@@ -42,8 +42,8 @@ BuildRequires:  systemd
 #BuildRequires: python-sphinx
 #BuildRequires: python-sphinx_rtd_theme
 
-Requires:       lua-socket
-Requires:       lua-sec
+Requires:       lua-socket-compat
+Requires:       lua-sec-compat
 
 Requires(pre): shadow-utils
 Requires(post): systemd
