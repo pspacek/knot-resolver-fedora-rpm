@@ -1,19 +1,22 @@
 %global _hardened_build 1
 
+# comment out this define using #%% if it is not a pre-release version
+%define PRERELEASE rc1
 Name:           knot-resolver
-Version:        1.1.1
-Release:        3%{?dist}
+Version:        1.2.0
+Release:        %{PRERELEASE}%{?PRERELEASE:.}1%{?dist}
 Summary:        Caching full DNS Resolver
 
 License:        GPLv3
 URL:            https://www.knot-resolver.cz/
-Source0:	https://secure.nic.cz/files/%{name}/%{name}-%{version}.tar.xz
+Source0:	https://secure.nic.cz/files/%{name}/%{name}-%{version}%{?PRERELEASE:-}%{PRERELEASE}.tar.xz
+Source1:	https://secure.nic.cz/files/%{name}/%{name}-%{version}%{?PRERELEASE:-}%{PRERELEASE}.tar.xz.asc
 
 # LuaJIT only on these arches
 ExclusiveArch: %{arm} aarch64 %{ix86} x86_64
 
-Source1:        config
-Source2:        root.keys
+Source2:        config
+Source3:        root.keys
 
 Source100:	kresd.service
 Source101:	kresd.socket
@@ -64,7 +67,7 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 The package contains development headers for Knot DNS Resolver.
 
 %prep
-%autosetup
+%setup -n %{name}-%{version}%{?PRERELEASE:-}%{PRERELEASE}
 rm -v scripts/bootstrap-depends.sh
 
 %build
@@ -84,8 +87,8 @@ rm -vr %{buildroot}%{_sysconfdir}/kresd
 # install configuration files
 mkdir -p %{buildroot}%{_sysconfdir}
 install -m 0755 -d %{buildroot}%{_sysconfdir}/kresd
-install -m 0644 -p %SOURCE1 %{buildroot}%{_sysconfdir}/kresd/config
-install -m 0644 -p %SOURCE2 %{buildroot}%{_sysconfdir}/kresd/root.keys
+install -m 0644 -p %SOURCE2 %{buildroot}%{_sysconfdir}/kresd/config
+install -m 0664 -p %SOURCE3 %{buildroot}%{_sysconfdir}/kresd/root.keys
 
 # install systemd units
 mkdir -p %{buildroot}%{_unitdir}
@@ -125,9 +128,9 @@ exit 0
 %files
 %license COPYING
 %doc %{_pkgdocdir}
-%attr(755,root,kresd) %dir %{_sysconfdir}/kresd
+%attr(775,root,kresd) %dir %{_sysconfdir}/kresd
 %attr(644,root,kresd) %config(noreplace) %{_sysconfdir}/kresd/config
-%attr(644,root,kresd) %config(noreplace) %{_sysconfdir}/kresd/root.keys
+%attr(664,root,kresd) %config(noreplace) %{_sysconfdir}/kresd/root.keys
 %attr(750,kresd,kresd) %dir %{_rundir}/kresd
 %{_unitdir}/kresd.service
 %{_unitdir}/kresd*.socket
@@ -143,6 +146,11 @@ exit 0
 %{_libdir}/libkres.so
 
 %changelog
+* Mon Jan 23 2017 Petr Spacek <petr.spacek@nic.cz> - 1.2.0-rc1
+- Update to latest upstream version
+- Fix packaging bug: depend on proper Lua library versions
+- Allow automatic trust anchor management to work
+
 * Sat Nov 19 2016 Peter Robinson <pbrobinson@fedoraproject.org> 1.1.1-3
 - Add ExclusiveArch for architectures with LuaJIT
 
