@@ -70,8 +70,7 @@ rm -v scripts/bootstrap-depends.sh
 %build
 %global build_paths PREFIX=%{_prefix} BINDIR=%{_bindir} LIBDIR=%{_libdir} INCLUDEDIR=%{_includedir} ETCDIR=%{_sysconfdir}/kresd
 %global build_flags V=1 CFLAGS="%{optflags}" LDFLAGS="%{__global_ldflags}" %{build_paths} HAS_go=no
-
-make %{?_smp_mflags} %{build_flags}
+%make_build %{build_flags}
 
 %install
 %make_install %{build_flags}
