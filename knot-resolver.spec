@@ -35,7 +35,8 @@ BuildRequires:  pkgconfig(cmocka)
 BuildRequires:  pkgconfig(socket_wrapper)
 
 BuildRequires:  systemd
-# FIXME: documentation fails to build on Fedora 23
+# FIXME: documentation fails to build on Fedora 25
+# https://bugzilla.redhat.com/show_bug.cgi?id=1333391
 #BuildRequires: doxygen
 #BuildRequires: breathe
 #BuildRequires: python-sphinx
