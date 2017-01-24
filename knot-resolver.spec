@@ -1,7 +1,7 @@
 %global _hardened_build 1
 
 # comment out this define using #%% if it is not a pre-release version
-%define PRERELEASE rc1
+%define PRERELEASE rc3
 Name:           knot-resolver
 Version:        1.2.0
 Release:        %{PRERELEASE}%{?PRERELEASE:.}1%{?dist}
